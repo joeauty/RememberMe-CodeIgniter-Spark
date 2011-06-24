@@ -4,8 +4,10 @@
  *
 */
 
-class rememberme {
+class Rememberme {
 
+	private $CI;
+	
 	function __construct() {
 		$this->CI =& get_instance();
 	}
@@ -18,23 +20,20 @@ class rememberme {
 		
 		$this->CI->load->library('user_agent');	
 		
-		$query = $this->CI->db->get_where('ci_cookies', array(
-			'netid' => $netid
-		));
+		// delete any cookies currently owned by netid
+		$this->CI->db->where('netid', $netid);
+		$this->CI->db->delete('ci_cookies');
 			
 		$cookie_id = uniqid('', true);			
-		if (!$query->num_rows()) {
-			
-			$insertdata = array(
-				'cookie_id' => $cookie_id,
-				'ip_address' => $_SERVER['REMOTE_ADDR'],
-				'user_agent' => $this->CI->agent->browser() . " " . $this->CI->agent->version() . " " . $this->CI->agent->platform(),
-				'netid' => $netid,
-				'created_at' => date('Y-m-d H:i:s')
-			);
+		$insertdata = array(
+			'cookie_id' => $cookie_id,
+			'ip_address' => $_SERVER['REMOTE_ADDR'],
+			'user_agent' => $this->CI->agent->agent_string(),
+			'netid' => $netid,
+			'created_at' => date('Y-m-d H:i:s')
+		);
 
-			$this->CI->db->insert('ci_cookies', $insertdata);					
-		}	
+		$this->CI->db->insert('ci_cookies', $insertdata);						
 		
 		// set cookie for 1 year
 		$cookie = array(
@@ -50,6 +49,22 @@ class rememberme {
 		$this->CI->session->set_userdata('rememberme_session', $netid);
 	}
 	
+	function deleteCookie() {
+		$query = $this->CI->db->get_where('ci_cookies', array(
+			'cookie_id' => get_cookie('rememberme_token')			
+		));
+		if (!$query->num_rows()) {
+			// no cookie to destroy, return
+			return;
+		}
+		$row = $query->row();
+		
+		$this->CI->session->sess_destroy();
+		$this->CI->db->where('netid', $row->netid);
+		$this->CI->db->delete('ci_cookies');
+		delete_cookie('rememberme_token');
+	}
+	
 	function verifyCookie() {											
 		$query = $this->CI->db->get_where('ci_cookies', array(
 			'cookie_id' => get_cookie('rememberme_token')			
@@ -62,15 +77,14 @@ class rememberme {
 				if ($this->CI->config->item('requiremodel')) {
 					$this->CI->load->model($this->CI->config->item('requiremodel'));
 				}
-				else if ($this->CI->config->item('requirelibrary')) {
+				if ($this->CI->config->item('requirelibrary')) {
 					$this->CI->load->library($this->CI->config->item('requirelibrary'));
 				}	
 
 				$authorize = call_user_func($this->CI->config->item('authfunc'), $row->netid);
 				
 				if (!$authorize) {
-					$this->CI->session->sess_destroy();
-					delete_cookie('rememberme_token');
+					$this->deleteCookie();
 					return false;
 				}
 			}			
@@ -80,15 +94,15 @@ class rememberme {
 				// session active, make sure cookie and session netids match
 				if ($this->CI->session->userdata('rememberme_session') !== $row->netid) {
 					return false;
-				}
+				}				
 			}
 			else {											
 				// create new session
-				$this->CI->session->set_userdata('rememberme_session', $row->netid);				
-				
-				// return netid		
-				return $row->netid;				
-			}					
+				$this->CI->session->set_userdata('rememberme_session', $row->netid);						
+			}	
+			
+			// return netid
+			return $row->netid;				
 		}
 		else {
 			return false;
