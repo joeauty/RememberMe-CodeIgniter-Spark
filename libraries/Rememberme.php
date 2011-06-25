@@ -1,8 +1,14 @@
 <?php
-/*
- * comments
+/**
+ * CodeIgniter Remember Me Spark
  *
-*/
+ * This CodeIgniter Spark provides a library for creating and verifying non-forgeable cookies suitable for "Remember Me?" type login checkboxes.
+ *
+ * By Joe Auty @ http://www.netmusician.org
+ * 
+ * http://getsparks.org/packages/RememberMe/show
+ * 
+ */
 
 class Rememberme {
 

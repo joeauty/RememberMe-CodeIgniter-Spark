@@ -39,7 +39,7 @@ Usage
 		}
 		
 
-Note that *$this->rememberme->verifyCookie();* will return true if the cookie is valid (and, optionally, the user name associated with the cookie passes your custom verification function). The CodeIgniter Session class is required by Remember Me for storing the user ID for that session, it is recommended that you use the following configuration options found in your applications main *config/config.php* file:
+Note that *$this->rememberme->verifyCookie();* will return true if the cookie is valid (and, optionally, the user name associated with the cookie passes your custom verification function). The CodeIgniter Session class and Cookie Helper is required by Remember Me and autoloaded for storing the user ID for that session, it is recommended that you use the following configuration options found in your applications main *config/config.php* file:
 
 	$config['sess_expire_on_close']	= TRUE;
 	$config['sess_encrypt_cookie']	= TRUE;
