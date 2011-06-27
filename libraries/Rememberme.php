@@ -50,6 +50,8 @@ class Rememberme {
 	}
 	
 	function deleteCookie() {
+		$this->CI->session->sess_destroy();
+		
 		$query = $this->CI->db->get_where('ci_cookies', array(
 			'cookie_id' => get_cookie('rememberme_token')			
 		));
@@ -59,7 +61,6 @@ class Rememberme {
 		}
 		$row = $query->row();
 		
-		$this->CI->session->sess_destroy();
 		$this->CI->db->where('netid', $row->netid);
 		$this->CI->db->delete('ci_cookies');
 		delete_cookie('rememberme_token');
