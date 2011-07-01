@@ -18,9 +18,9 @@ Usage
 
 1. Create your *ci_cookies* table in the database used by your site using the included schema *ci_cookies.sql*
 2. If you wish to provide your own authorization check to verify users that have valid cookies but no session information, you will need to inform RememberMe of the model or library where this function resides, as well as this functions's name. See the included sample *config/rememberme.php* for this configuration. If you wish to disable this feature, comment out the *authfunc* config option in this file.
-3. Create your login form with a remember me checkbox, and in your application if this checkbox is checked execute the following (where *$this->input->post('rememberme')* is your form's remember me checkbox input):
+3. Create your login form with a remember me checkbox, and in your application if this checkbox is checked execute the following (where *$this->input->post('netid')* is your form's netid):
 	
-		$this->rememberme->setCookie($this->input->post('rememberme'));
+		$this->rememberme->setCookie($this->input->post('netid'));
 
 4. To verify the cookie, include code such as the following:
 
