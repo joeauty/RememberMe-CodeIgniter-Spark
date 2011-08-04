@@ -47,7 +47,7 @@ class Rememberme {
 			'value' => $cookie_id,
 			'expire' => 31557600,
 			'domain' => '.' . $_SERVER['SERVER_NAME'],
-			'secure' => $_SERVER['HTTPS']
+			'secure' => isset($_SERVER['HTTPS']) ? $_SERVER['HTTPS'] : 0
 		);
 		set_cookie($cookie);
 		
