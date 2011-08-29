@@ -49,3 +49,10 @@ Note that *$this->rememberme->verifyCookie();* will return true if the cookie is
 The *sess_expire_on_close* setting will allow your local sessions to be regenerated at the beginning of each new session upon cookie verification, and the other settings provide some additional security (see the CodeIgniter user guide on creating your *ci_sessions* table). Remember Me will set its own session variable called *rememberme_session* tracking the netid/username of the current user using the CodeIgniter Session class for additional verification. You can use this as a means of tracking the current user within your application, or else supplement this with your own session data. In the above code fragment *$this->session->userdata('user_id')* is tracking the current user numerical ID stored in our database's *users* table (in this case the numerical ID differs from the netid/username), but you name this variable whatever you want, you don't have to stick to the naming schemes used within the above code fragment.
 
 
+Changelog
+=========
+
+1.0.3 
+-----
+
+- set_cookie sets cookie path to support multiple sites using this spark on the same domain
