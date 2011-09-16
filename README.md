@@ -48,9 +48,29 @@ Note that *$this->rememberme->verifyCookie();* will return true if the cookie is
 	
 The *sess_expire_on_close* setting will allow your local sessions to be regenerated at the beginning of each new session upon cookie verification, and the other settings provide some additional security (see the CodeIgniter user guide on creating your *ci_sessions* table). Remember Me will set its own session variable called *rememberme_session* tracking the netid/username of the current user using the CodeIgniter Session class for additional verification. You can use this as a means of tracking the current user within your application, or else supplement this with your own session data. In the above code fragment *$this->session->userdata('user_id')* is tracking the current user numerical ID stored in our database's *users* table (in this case the numerical ID differs from the netid/username), but you name this variable whatever you want, you don't have to stick to the naming schemes used within the above code fragment.
 
+Tracking the Original Landing Page
+==================================
+
+You can keep a record of the original page the user requested before rendering/being redirected your login form by running the following on the landing page:
+
+	$this->rememberme->recordOrigPage();
+	
+and on successful login you can redirect back to this page via the following:
+
+	$this->load->helper('url');
+	redirect($this->rememberme->getOrigPage());
+
 
 Changelog
 =========
+
+1.0.4
+-----
+
+- added recordOrigPage() and getOrigPage() functions. This version has undergone compatibility testing with CodeIgniter 2.0.3, and also requires updating the schema for the *ci_cookies* table. The newer, updated schema can be found in the included *ci_cookies.sql* file. You can also apply the schema update by running the following command:
+
+	ALTER TABLE  `ci_cookies` ADD  `orig_page_requested` VARCHAR( 120 ) NOT NULL ,
+	ADD  `php_session_id` VARCHAR( 40 ) NOT NULL
 
 1.0.3 
 -----
