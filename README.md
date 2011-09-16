@@ -64,6 +64,12 @@ and on successful login you can redirect back to this page via the following:
 Changelog
 =========
 
+1.1
+---
+
+- When recordOrigPage() has been used, these temporary records written to *ci_cookies* are discarded on login, but the *orig_page_requested* value assigned to this record salvaged and recorded along with the rest of the cookie information written to *ci_cookies*. Decided this feature warranted a version bump to 1.1. Also modified autoload.php to autoload CI dependencies, two which were missing from the previous version.
+
+
 1.0.4
 -----
 

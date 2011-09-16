@@ -24,15 +24,32 @@ class Rememberme {
 			return;
 		}
 		
-		session_start();
-		$this->CI->load->library('user_agent');	
-		
+		session_start();		
 		// delete any existing table entries belonging to user
 		$nocookie ? $this->CI->db->where('php_session_id', session_id()) : 
 					$this->CI->db->where('netid', $netid);		
 		$this->CI->db->delete('ci_cookies');	
 		
-		$nocookie ? $cookie_id = "" : $cookie_id = uniqid('', true);
+		if ($nocookie) {
+			// record landing page
+			$cookie_id = "";
+			$orig_page_requested = $this->CI->uri->uri_string();
+		}
+		else {
+			$cookie_id = uniqid('', true);			
+			
+			// delete temporary landing page record, if it exists,
+			// but salvage orig_page_requested var
+			$query = $this->CI->db->get_where('ci_cookies', array(
+				'php_session_id' => session_id()
+			));
+			if ($query->num_rows()) {
+				$orig_page_requested = $query->row()->orig_page_requested;
+			}
+			$this->CI->db->delete('ci_cookies', array(
+				'php_session_id' => session_id()
+			));			
+		}
 	
 		$insertdata = array(
 			'cookie_id' => $cookie_id,
@@ -40,7 +57,7 @@ class Rememberme {
 			'user_agent' => $this->CI->agent->agent_string(),
 			'netid' => $netid,
 			'created_at' => date('Y-m-d H:i:s'),
-			'orig_page_requested' => $this->CI->uri->uri_string(),
+			'orig_page_requested' => $orig_page_requested,
 			'php_session_id' => session_id()
 		);	
 		$this->CI->db->insert('ci_cookies', $insertdata);
