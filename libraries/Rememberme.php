@@ -36,7 +36,8 @@ class Rememberme {
 			$orig_page_requested = $this->CI->uri->uri_string();
 		}
 		else {
-			$cookie_id = uniqid('', true);			
+			$cookie_id = uniqid('', true);
+			$orig_page_requested = "";		
 			
 			// delete temporary landing page record, if it exists,
 			// but salvage orig_page_requested var
@@ -69,7 +70,7 @@ class Rememberme {
 				'value' => $cookie_id,
 				'expire' => 31557600,
 				'domain' => '.' . $_SERVER['SERVER_NAME'],
-				'path' => $apppath,
+				'path' => preg_replace('/^(http|https):\/\/(www\.)?' . $_SERVER['SERVER_NAME'] . '/', '', base_url()),
 				'secure' => isset($_SERVER['HTTPS']) ? $_SERVER['HTTPS'] : 0
 			);
 			set_cookie($cookie);
