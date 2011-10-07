@@ -64,6 +64,11 @@ and on successful login you can redirect back to this page via the following:
 Changelog
 =========
 
+1.1.1
+-----
+
+- Set default orig_page_requested to null value to suppress errors, fix cookie path value
+
 1.1.0
 -----
 
