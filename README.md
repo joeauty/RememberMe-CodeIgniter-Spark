@@ -64,6 +64,12 @@ and on successful login you can redirect back to this page via the following:
 Changelog
 =========
 
+1.2.0
+-----
+
+- A bunch of bugfixes to verifyCookie
+- Domains are now set in cookies so that Spark can be used on domains and subdomains simultaneously
+
 1.1.1
 -----
 
