@@ -27,8 +27,8 @@ class Rememberme {
 		session_start();		
 		// delete any existing table entries belonging to user
 		$nocookie ? $this->CI->db->where('php_session_id', session_id()) : 
-					$this->CI->db->where('netid', $netid);		
-		$this->CI->db->delete('ci_cookies');	
+					$this->CI->db->where('netid', $netid);
+		$this->CI->db->delete('ci_cookies');
 		
 		if ($nocookie) {
 			// record landing page
@@ -37,7 +37,7 @@ class Rememberme {
 		}
 		else {
 			$cookie_id = uniqid('', true);
-			$orig_page_requested = "";		
+			$orig_page_requested = "";
 			
 			// delete temporary landing page record, if it exists,
 			// but salvage orig_page_requested var
@@ -49,7 +49,7 @@ class Rememberme {
 			}
 			$this->CI->db->delete('ci_cookies', array(
 				'php_session_id' => session_id()
-			));			
+			));
 		}
 	
 		$insertdata = array(
@@ -63,17 +63,22 @@ class Rememberme {
 		);	
 		$this->CI->db->insert('ci_cookies', $insertdata);
 		
+		// set cookie for TLD, not subdomains
+		$host = explode('.', $_SERVER['SERVER_NAME']);
+		$segments = count($host) - 1;
+		$domain = $host[($segments - 1)] . "." . $host[$segments];
+		
 		if (!$nocookie) {
 			// set cookie for 1 year
 			$cookie = array(
-				'name' => 'rememberme_token',
+				'name' => 'rmtoken_' . str_replace('.', '_', $_SERVER['SERVER_NAME']),
 				'value' => $cookie_id,
 				'expire' => 31557600,
-				'domain' => '.' . $_SERVER['SERVER_NAME'],
-				'path' => preg_replace('/^(http|https):\/\/(www\.)?' . $_SERVER['SERVER_NAME'] . '/', '', base_url()),
+				'domain' => $domain,
+				'path' => preg_replace('/^(http|https):\/\/(www\.)?' . $_SERVER['SERVER_NAME'] . '/', '', preg_replace('/\/$/','', base_url())),
 				'secure' => isset($_SERVER['HTTPS']) ? $_SERVER['HTTPS'] : 0
 			);
-			set_cookie($cookie);
+			$this->CI->input->set_cookie($cookie);
 		
 			// establish session
 			$this->CI->session->set_userdata('rememberme_session', $netid);	
@@ -101,7 +106,7 @@ class Rememberme {
 		$this->CI->session->sess_destroy();
 		
 		$query = $this->CI->db->get_where('ci_cookies', array(
-			'cookie_id' => get_cookie('rememberme_token')			
+			'cookie_id' => $this->CI->input->cookie('rmtoken_' . str_replace('.', '_', $_SERVER['SERVER_NAME']))
 		));
 		if (!$query->num_rows()) {
 			// no cookie to destroy, return
@@ -115,11 +120,14 @@ class Rememberme {
 	}
 	
 	function verifyCookie() {			
-		if (!get_cookie('rememberme_token')) { return false; }
-									
+		if (!$this->CI->input->cookie('rmtoken_' . str_replace('.', '_', $_SERVER['SERVER_NAME']))) { 
+			return false; 
+		}
+		
 		$query = $this->CI->db->get_where('ci_cookies', array(
-			'cookie_id' => get_cookie('rememberme_token')			
+			'cookie_id' => $this->CI->input->cookie('rmtoken_' . str_replace('.', '_', $_SERVER['SERVER_NAME']))
 		));
+		//print $this->CI->db->last_query();
 
 		if ($query->num_rows()) {
 			$row = $query->row();
@@ -139,22 +147,22 @@ class Rememberme {
 					$this->deleteCookie();
 					return false;
 				}
-			}			
+			}
 			
 			// valid cookie
 			if ($this->CI->session->userdata('rememberme_session')) {
 				// session active, make sure cookie and session netids match
 				if ($this->CI->session->userdata('rememberme_session') !== $row->netid) {
 					return false;
-				}				
+				}
 			}
-			else {											
+			else {
 				// create new session
-				$this->CI->session->set_userdata('rememberme_session', $row->netid);						
+				$this->CI->session->set_userdata('rememberme_session', $row->netid);
 			}	
 			
 			// return netid
-			return $row->netid;				
+			return $row->netid;
 		}
 		else {
 			return false;
