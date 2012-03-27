@@ -51,10 +51,12 @@ class Rememberme {
 				'php_session_id' => session_id()
 			));
 		}
+		
+		$ip_address = ($_SERVER['SERVER_NAME'] == "localhost") ? '127.0.0.1' : $_SERVER['REMOTE_ADDR'];
 	
 		$insertdata = array(
 			'cookie_id' => $cookie_id,
-			'ip_address' => $_SERVER['REMOTE_ADDR'],
+			'ip_address' => $ip_address,
 			'user_agent' => $this->CI->agent->agent_string(),
 			'netid' => $netid,
 			'created_at' => date('Y-m-d H:i:s'),
@@ -66,7 +68,7 @@ class Rememberme {
 		// set cookie for TLD, not subdomains
 		$host = explode('.', $_SERVER['SERVER_NAME']);
 		$segments = count($host) - 1;
-		$domain = $host[($segments - 1)] . "." . $host[$segments];
+		$domain = ($_SERVER['SERVER_NAME'] == "localhost") ? false : $host[($segments - 1)] . "." . $host[$segments];
 		
 		if (!$nocookie) {
 			// set cookie for 1 year
