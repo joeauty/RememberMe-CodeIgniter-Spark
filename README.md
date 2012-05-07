@@ -69,6 +69,7 @@ Changelog
 -----
 
 - Support setting cookies for localhost
+- bump CodeIgniter compatibility version to 2.1
 
 1.2.0
 -----
