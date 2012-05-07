@@ -65,11 +65,16 @@ and on successful login you can redirect back to this page via the following:
 Changelog
 =========
 
+1.2.2
+-----
+
+- bump CodeIgniter compatibility version to 2.1
+- improve this README file
+
 1.2.1
 -----
 
 - Support setting cookies for localhost
-- bump CodeIgniter compatibility version to 2.1
 
 1.2.0
 -----
