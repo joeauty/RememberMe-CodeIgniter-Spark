@@ -26,10 +26,10 @@ Usage
 
 		$cookie_user = $this->rememberme->verifyCookie();
 		if ($cookie_user) {
-			// find user id of cookie_user stored in application database			
-			$user = User::findUser($cookie_user);			
-			// set session if necessary								
-			if (!$this->session->userdata('user_id')) {							
+			// find user id of cookie_user stored in application database
+			$user = User::findUser($cookie_user);
+			// set session if necessary
+			if (!$this->session->userdata('user_id')) {
 				$this->session->set_userdata('user_id', $user);
 			}
 			$this->user = $user;
@@ -38,8 +38,9 @@ Usage
 			$this->user = $this->session->userdata('user_id');
 		}
 		
+I like to put this code in my CodeIgniter core controller so that this authentication check occurs on every page load, and for those pages I want to make public (i.e. not require authentication), I add exceptions where necessary. *$cookie_user* verifies the cookie set in the user's browser with the record in the database, if they have opted to click on your remember me checkbox at login, and the second conditional here involving the *user_id* session variable is for users that have not clicked on the remember me checkbox, but are still considered logged in since they have an active session. The additional stuff in the first conditional involving invoking *User::findUser()* is just some additional stuff you can throw in to make sure that user actually has application info for it, you can tweak this to your liking. Setting the session variable *user_id* is similarly for your convenience for keeping track of the application database information (perhaps containing additional metadata) for that user saved in the cookie. You can tweak this to your liking as well.
 
-Note that *$this->rememberme->verifyCookie();* will return true if the cookie is valid (and, optionally, the user name associated with the cookie passes your custom verification function). The CodeIgniter Session class and Cookie Helper is required by Remember Me and autoloaded for storing the user ID for that session, it is recommended that you use the following configuration options found in your applications main *config/config.php* file:
+The CodeIgniter Session class and Cookie Helper is required by Remember Me and autoloaded for storing the user ID for that session, it is recommended that you use the following configuration options found in your applications main *config/config.php* file:
 
 	$config['sess_expire_on_close']	= TRUE;
 	$config['sess_encrypt_cookie']	= TRUE;
