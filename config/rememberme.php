@@ -12,6 +12,6 @@ $config['requirelibrary'] = '';
 $config['authfunc'] = 'User::authorize';
 
 // Database table for cookie hashes
-$config['dbtable'] = 'ia_ci_cookies';
+$config['dbtable'] = 'ci_cookies';
 
 ?>
