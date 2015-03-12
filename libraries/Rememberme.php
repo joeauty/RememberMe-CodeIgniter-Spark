@@ -13,9 +13,11 @@
 class Rememberme {
 
 	private $CI;
+	private $dbtable;
 	
 	function __construct() {
 		$this->CI =& get_instance();
+		$this->dbtable = $this->CI->config->item('db_table');
 	}
 	
 	function setCookie($netid = "", $nocookie = false) {
@@ -28,7 +30,7 @@ class Rememberme {
 		// delete any existing table entries belonging to user
 		$nocookie ? $this->CI->db->where('php_session_id', session_id()) : 
 					$this->CI->db->where('netid', $netid);
-		$this->CI->db->delete('ci_cookies');
+		$this->CI->db->delete($this->dbtable);
 		
 		if ($nocookie) {
 			// record landing page
@@ -41,13 +43,13 @@ class Rememberme {
 			
 			// delete temporary landing page record, if it exists,
 			// but salvage orig_page_requested var
-			$query = $this->CI->db->get_where('ci_cookies', array(
+			$query = $this->CI->db->get_where($this->dbtable, array(
 				'php_session_id' => session_id()
 			));
 			if ($query->num_rows()) {
 				$orig_page_requested = $query->row()->orig_page_requested;
 			}
-			$this->CI->db->delete('ci_cookies', array(
+			$this->CI->db->delete($this->dbtable, array(
 				'php_session_id' => session_id()
 			));
 		}
@@ -63,7 +65,7 @@ class Rememberme {
 			'orig_page_requested' => $orig_page_requested,
 			'php_session_id' => session_id()
 		);	
-		$this->CI->db->insert('ci_cookies', $insertdata);
+		$this->CI->db->insert($this->dbtable, $insertdata);
 		
 		// set cookie for TLD, not subdomains
 		$host = explode('.', $_SERVER['SERVER_NAME']);
@@ -93,7 +95,7 @@ class Rememberme {
 	
 	function getOrigPage() {
 		session_start();
-		$query = $this->CI->db->get_where('ci_cookies', array(
+		$query = $this->CI->db->get_where($this->dbtable, array(
 			'php_session_id' => session_id()
 		));
 		if ($query->num_rows()) {
@@ -107,7 +109,7 @@ class Rememberme {
 	function deleteCookie() {
 		$this->CI->session->sess_destroy();
 		
-		$query = $this->CI->db->get_where('ci_cookies', array(
+		$query = $this->CI->db->get_where($this->dbtable, array(
 			'cookie_id' => $this->CI->input->cookie('rmtoken_' . str_replace('.', '_', $_SERVER['SERVER_NAME']))
 		));
 		if (!$query->num_rows()) {
@@ -117,7 +119,7 @@ class Rememberme {
 		$row = $query->row();
 		
 		$this->CI->db->where('netid', $row->netid);
-		$this->CI->db->delete('ci_cookies');
+		$this->CI->db->delete($this->dbtable);
 		delete_cookie('rememberme_token');
 	}
 	
@@ -126,7 +128,7 @@ class Rememberme {
 			return false; 
 		}
 		
-		$query = $this->CI->db->get_where('ci_cookies', array(
+		$query = $this->CI->db->get_where($this->dbtable, array(
 			'cookie_id' => $this->CI->input->cookie('rmtoken_' . str_replace('.', '_', $_SERVER['SERVER_NAME']))
 		));
 		//print $this->CI->db->last_query();

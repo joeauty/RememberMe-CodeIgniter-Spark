@@ -11,4 +11,7 @@ $config['requirelibrary'] = '';
 // Provide the reference to your authorize function here as a string
 $config['authfunc'] = 'User::authorize';
 
+// Database table for cookie hashes
+$config['dbtable'] = 'ci_cookies';
+
 ?>
